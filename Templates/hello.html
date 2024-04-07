@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speech to Text</title>
+</head>
+
+<body>
+    <button id="start">Start Speech Recognition</button>
+    <input type="text" id="output">
+
+    <script>
+        const startButton = document.getElementById('start');
+        const outputDiv = document.getElementById('output');
+        let recognition = null;
+        startButton.addEventListener('click', () => {
+            startButton.disabled = true;
+            startButton.textContent = 'Listening...';
+            recognition = new window.webkitSpeechRecognition(); // For Chrome
+            recognition.continuous = true;
+            recognition.interimResults = true;
+
+            recognition.onstart = () => {
+                console.log('Speech recognition started');
+            };
+
+            recognition.onerror = (event) => {
+                console.error('Speech recognition error:', event.error);
+                outputDiv.value = 'Error occurred. Please try again.';
+            };
+
+             recognition.onend = () => {
+                 console.log(document.querySelector('#output').value)
+                console.log('Speech recognition ended');
+                startButton.disabled = false;
+                startButton.textContent = 'Start Speech Recognition';
+             };
+            recognition.onresult = (event) => {
+                const transcript = Array.from(event.results)
+                    .map((result) => result[0].transcript)
+                    .join('');
+                outputDiv.value = transcript;
+            };
+
+            recognition.start();
+        });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                if (recognition) {
+                    recognition.stop();
+                    startButton.disabled = false;
+                    startButton.textContent = 'Start Speech Recognition';
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>
